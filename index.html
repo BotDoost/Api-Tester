@@ -3,191 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مقاله‌نویس هوش مصنوعی - Llama</title>
+    <title>Hugging Face API - نمونه فارسی</title>
     <style>
-        body {
+        * {
+            box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f5f7fa;
+            color: #333;
             line-height: 1.6;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f7fa;
-            color: #333;
         }
-        
-        h1 {
-            color: #2c3e50;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
         .container {
-            background-color: white;
-            border-radius: 8px;
-            padding: 25px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-top: 20px;
         }
-        
+        h1 {
+            color: #2d3748;
+            text-align: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
         label {
             display: block;
             margin-bottom: 8px;
             font-weight: bold;
         }
-        
-        input[type="text"], textarea, select {
+        select, textarea, input {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 20px;
+            padding: 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
             font-size: 16px;
         }
-        
         textarea {
-            min-height: 200px;
+            min-height: 120px;
+            resize: vertical;
         }
-        
         button {
-            background-color: #3498db;
+            background-color: #4299e1;
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 4px;
+            padding: 14px 24px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 16px;
-            transition: background-color 0.3s;
+            font-weight: bold;
             display: block;
-            margin: 0 auto;
+            width: 100%;
+            transition: background-color 0.3s;
         }
-        
         button:hover {
-            background-color: #2980b9;
+            background-color: #3182ce;
         }
-        
+        #result {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #edf2f7;
+            border-radius: 8px;
+            min-height: 100px;
+            white-space: pre-wrap;
+        }
         .loading {
             text-align: center;
+            padding: 20px;
+        }
+        .hidden {
             display: none;
-            margin: 20px 0;
-        }
-        
-        .options {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .option-group {
-            flex: 1;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>مقاله‌نویس هوش مصنوعی (Llama)</h1>
+        <h1>API Hugging Face</h1>
         
-        <div class="options">
-            <div class="option-group">
-                <label for="model">مدل:</label>
-                <select id="model">
-                    <option value="persian-llama-13b">PersianLLaMA 13B</option>
-                    <option value="parthusgpt">ParthusGPT</option>
-                </select>
-            </div>
-            
-            <div class="option-group">
-                <label for="length">طول مقاله:</label>
-                <select id="length">
-                    <option value="300">کوتاه (300 کلمه)</option>
-                    <option value="600" selected>متوسط (600 کلمه)</option>
-                    <option value="1000">بلند (1000 کلمه)</option>
-                </select>
-            </div>
+        <div class="input-group">
+            <label for="model">انتخاب مدل:</label>
+            <select id="model">
+                <option value="gpt2">GPT-2 (تولید متن انگلیسی)</option>
+                <option value="HooshvareLab/bert-fa-base-uncased">BERT پارسی</option>
+                <option value="facebook/bart-large-cnn">BART (خلاصه‌سازی)</option>
+            </select>
         </div>
         
-        <div>
-            <label for="topic">موضوع مقاله:</label>
-            <input type="text" id="topic" placeholder="مثال: تأثیر هوش مصنوعی بر آموزش">
-            
-            <button id="generate-btn">تولید مقاله</button>
-            
-            <div class="loading" id="loading">
-                در حال تولید مقاله... لطفاً صبر کنید
-            </div>
+        <div class="input-group">
+            <label for="input">ورودی:</label>
+            <textarea id="input" placeholder="متن خود را وارد کنید..."></textarea>
         </div>
         
-        <div class="result">
-            <label for="article">مقاله تولید شده:</label>
-            <textarea id="article" readonly></textarea>
+        <button onclick="runModel()">اجرای مدل</button>
+        
+        <div id="loading" class="loading hidden">
+            در حال پردازش... لطفاً منتظر بمانید
+            <div class="loader"></div>
+        </div>
+        
+        <div id="result" class="hidden">
+            <!-- نتایج اینجا نمایش داده می‌شود -->
         </div>
     </div>
 
     <script>
-        document.getElementById('generate-btn').addEventListener('click', async () => {
-            const topic = document.getElementById('topic').value.trim();
-            const model = document.getElementById('model').value;
-            const length = document.getElementById('length').value;
-            const articleOutput = document.getElementById('article');
-            const loading = document.getElementById('loading');
+        // API Token خود را اینجا قرار دهید
+        const HF_API_TOKEN = "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";
+        const API_URL = "https://api-inference.huggingface.co/models/";
+
+        async function runModel() {
+            const model = document.getElementById("model").value;
+            const inputText = document.getElementById("input").value;
             
-            if (!topic) {
-                alert('لطفاً موضوع مقاله را وارد کنید');
-                return;
-            }
+            // نمایش لوودینگ
+            document.getElementById("loading").classList.remove("hidden");
+            document.getElementById("result").classList.add("hidden");
             
             try {
-                loading.style.display = 'block';
-                articleOutput.value = '';
+                // ارسال درخواست به Hugging Face API
+                const response = await fetch(`${API_URL}${model}`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${HF_API_TOKEN}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ inputs: inputText })
+                });
                 
-                // انتخاب مدل بر اساس انتخاب کاربر
-                const modelEndpoint = {
-                    'persian-llama-13b': 'https://api-inference.huggingface.co/models/m3hrdadfi/persian-llama-13b',
-                    'parthusgpt': 'https://api-inference.huggingface.co/models/erfanzar/ParthusGPT'
-                }[model];
-                
-                const response = await fetch(
-                    modelEndpoint,
-                    {
-                        method: "POST",
-                        headers: {
-                            "Authorization": "Bearer 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",
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            "inputs": `مقاله‌ای ${length} کلمه‌ای درباره "${topic}" با ساختار حرفه‌ای شامل مقدمه، بدنه اصلی و نتیجه‌گیری بنویس`,
-                            "parameters": {
-                                "max_length": parseInt(length) * 1.5, // ضریب برای توکن‌ها
-                                "temperature": 0.7,
-                                "repetition_penalty": 2.0,
-                                "top_p": 0.9
-                            }
-                        })
-                    }
-                );
-
-                // مدیریت پاسخ‌های غیرJSON
-                const responseText = await response.text();
-                let data;
-                
-                try {
-                    data = JSON.parse(responseText);
-                } catch {
-                    throw new Error(`پاسخ سرور: ${responseText.substring(0, 100)}...`);
+                if (!response.ok) {
+                    throw new Error(`خطای API: ${response.status}`);
                 }
                 
-                if (data.error) {
-                    throw new Error(data.error);
-                } else if (data[0]?.generated_text) {
-                    articleOutput.value = data[0].generated_text;
-                } else {
-                    throw new Error("فرمت پاسخ نامعتبر است");
-                }
+                const data = await response.json();
                 
+                // نمایش نتیجه
+                document.getElementById("result").innerText = 
+                    JSON.stringify(data, null, 2);
+                
+                document.getElementById("result").classList.remove("hidden");
             } catch (error) {
-                articleOutput.value = `❗ خطا: ${error.message}\n\n🔹 راهکار:\n1. مدل را تغییر دهید\n2. طول مقاله را کاهش دهید\n3. چند دقیقه صبر کنید و دوباره امتحان کنید`;
-            } finally {
-                loading.style.display = 'none';
-            }
-        });
-    </script>
-</body>
-</html>
+                document.getElementById("result").innerText = 
+                    `خطا: ${error.message}`;
+                document.getElementById("result").classList.remove("hidden");
+            } finally
