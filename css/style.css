@@ -1,0 +1,181 @@
+/* Reset و فونت‌ها */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&family=Vazirmatn:wght@400;700&display=swap');
+
+:root {
+    --primary-color: #a12c2f; /* رنگ قرمز شیرازی */
+    --secondary-color: #f8b195;
+    --text-color: #333;
+    --bg-color: #f9f1e6;
+    --chat-bg: #fff9f0;
+    --user-msg: #e6f7ff;
+    --bot-msg: #fff1e6;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Vazirmatn', 'Noto Nastaliq Urdu', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.8;
+}
+
+/* هدر شیرازی */
+.shirazi-header {
+    background: linear-gradient(135deg, var(--primary-color), #d7385e);
+    color: white;
+    text-align: center;
+    padding: 2rem 1rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.header-content h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.header-decoration {
+    margin-top: 1.5rem;
+    position: relative;
+}
+
+.broken-phone {
+    font-size: 3rem;
+    color: rgba(255,255,255,0.2);
+    animation: shake 5s infinite;
+}
+
+.persian-pattern {
+    position: absolute;
+    width: 100%;
+    height: 20px;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,10 Q50,5 0,10 Z" fill="white" opacity="0.1"/></svg>');
+    bottom: -10px;
+    left: 0;
+}
+
+/* بخش چت */
+.chat-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    background: var(--chat-bg);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.chat-messages {
+    height: 500px;
+    padding: 1.5rem;
+    overflow-y: auto;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" opacity="0.03"><path d="M30,50 Q50,30 70,50 T90,50" fill="none" stroke="%23a12c2f" stroke-width="2"/></svg>');
+}
+
+.message {
+    margin-bottom: 1rem;
+    padding: 0.8rem 1.2rem;
+    border-radius: 1.5rem;
+    max-width: 70%;
+    position: relative;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.user-message {
+    background: var(--user-msg);
+    margin-left: auto;
+    border-bottom-right-radius: 0.3rem;
+}
+
+.bot-message {
+    background: var(--bot-msg);
+    margin-right: auto;
+    border-bottom-left-radius: 0.3rem;
+}
+
+.input-area {
+    display: flex;
+    padding: 1rem;
+    background: white;
+    border-top: 1px solid #eee;
+}
+
+#user-input {
+    flex: 1;
+    padding: 0.8rem 1.2rem;
+    border: 2px solid #eee;
+    border-radius: 2rem;
+    font-family: inherit;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+#user-input:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+}
+
+#send-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0 1.5rem;
+    margin-right: 0.5rem;
+    border-radius: 2rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#send-btn:hover {
+    background: #8a2326;
+    transform: translateY(-2px);
+}
+
+/* انیمیشن‌ها */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* رسپانسیو */
+@media (max-width: 768px) {
+    .header-content h1 {
+        font-size: 1.8rem;
+    }
+    
+    .subtitle {
+        font-size: 0.9rem;
+    }
+    
+    .chat-container {
+        margin: 1rem;
+        border-radius: 10px;
+    }
+    
+    .message {
+        max-width: 85%;
+    }
+}
