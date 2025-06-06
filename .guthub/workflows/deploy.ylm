@@ -1,0 +1,26 @@
+name: Deploy with HF Token
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Inject HF Token
+        run: |
+          sed -i "s/__HF_TOKEN__/${{ secrets.HFTOK }}/g" src/js/config.js
+          
+      - name: Build Project
+        run: |
+          npm install
+          npm run build
+
+      - name: Deploy to Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
