@@ -77,6 +77,19 @@
             text-align: center;
             padding: 20px;
         }
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         .hidden {
             display: none;
         }
@@ -84,7 +97,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>API Hugging oooooo Face</h1>
+        <h1>Hugging Face API - نمونه فارسی</h1>
         
         <div class="input-group">
             <label for="model">انتخاب مدل:</label>
@@ -121,6 +134,11 @@
             const model = document.getElementById("model").value;
             const inputText = document.getElementById("input").value;
             
+            if (!inputText) {
+                alert("لطفاً متن ورودی را وارد کنید");
+                return;
+            }
+            
             // نمایش لوودینگ
             document.getElementById("loading").classList.remove("hidden");
             document.getElementById("result").classList.add("hidden");
@@ -130,7 +148,7 @@
                 const response = await fetch(`${API_URL}${model}`, {
                     method: "POST",
                     headers: {
-                        "Authorization": `Bearer ${HF_API_TOKEN}`,
+                        "Authorization": HF_API_TOKEN,
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({ inputs: inputText })
@@ -143,12 +161,26 @@
                 const data = await response.json();
                 
                 // نمایش نتیجه
-                document.getElementById("result").innerText = 
-                    JSON.stringify(data, null, 2);
+                const resultElement = document.getElementById("result");
+                if (Array.isArray(data) {
+                    resultElement.innerText = data.map(item => {
+                        if (item.generated_text) return item.generated_text;
+                        if (item.summary_text) return item.summary_text;
+                        return JSON.stringify(item, null, 2);
+                    }).join("\n\n");
+                } else {
+                    resultElement.innerText = JSON.stringify(data, null, 2);
+                }
                 
-                document.getElementById("result").classList.remove("hidden");
+                resultElement.classList.remove("hidden");
             } catch (error) {
                 document.getElementById("result").innerText = 
-                    `خطا: ${error.message}`;
+                    `خطا در ارتباط با سرور: ${error.message}`;
                 document.getElementById("result").classList.remove("hidden");
-            } finally
+            } finally {
+                document.getElementById("loading").classList.add("hidden");
+            }
+        }
+    </script>
+</body>
+</html>
